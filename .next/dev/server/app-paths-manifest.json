@@ -1,0 +1,7 @@
+{
+  "/api/blogs/comments/route": "app/api/blogs/comments/route.js",
+  "/api/blogs/views/route": "app/api/blogs/views/route.js",
+  "/blogs/[slug]/page": "app/blogs/[slug]/page.js",
+  "/blogs/page": "app/blogs/page.js",
+  "/page": "app/page.js"
+}
