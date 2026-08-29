@@ -312,7 +312,7 @@ function writeState(patch) {
     const current = readState();
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...current, ...patch }));
   } catch {
-    /* localStorage unavailable — fail silently, popup just won't be capped */
+    /* localStorage unavailable — fail silently */
   }
 }
 
@@ -325,7 +325,7 @@ export default function ExitIntentPopup() {
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState(""); // "", "loading", "success", "error"
+  const [status, setStatus] = useState(""); 
   const shownRef = useRef(false);
   const sessionShownRef = useRef(false);
 
@@ -433,37 +433,40 @@ export default function ExitIntentPopup() {
           exit={{ opacity: 0 }}
           role="dialog"
           aria-modal="true"
-          aria-labelledby="exit-popup-heading"
           onClick={handleClose}
         >
           <motion.div
-            className="relative w-full max-w-md max-h-[95dvh] overflow-y-auto rc-blueprint-card bg-[var(--rc-paper)] p-6 sm:p-8"
+            className="relative w-full max-w-lg max-h-[95dvh] overflow-y-auto bg-white rounded-[24px] shadow-2xl p-6 sm:p-8"
             initial={{ scale: 0.95, y: 15, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.95, y: 15, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 280 }}
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Close Button Matching the Target Design */}
             <button
               onClick={handleClose}
               aria-label="Close"
-              className="absolute top-2 right-2 sm:top-3 sm:right-3 w-10 h-10 flex items-center justify-center text-2xl text-[var(--rc-ink-soft)] hover:text-[var(--rc-circuit)] transition rounded-full"
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-800 transition"
             >
-              ×
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
 
-            <span className="rc-eyebrow" style={{ color: "var(--rc-trace)" }}>
-              Before you go
-            </span>
+            {/* Target Design Eyebrow */}
+            <div className="flex items-center gap-2 mb-3">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+              <span className="text-xs font-bold tracking-widest text-red-500 uppercase">
+                Before you go
+              </span>
+            </div>
 
-            <h2
-              id="exit-popup-heading"
-              className="rc-display text-xl sm:text-[1.7rem] font-semibold text-[var(--rc-ink)] mt-2 sm:mt-3 leading-tight pr-6 sm:pr-0"
-            >
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight pr-6">
               Want to know what's actually slowing your site down?
             </h2>
 
-            <p className="rc-body text-sm sm:text-base text-[var(--rc-ink-soft)] mt-3 leading-relaxed">
+            <p className="text-sm sm:text-base text-gray-600 mt-3 leading-relaxed">
               Run our free instant audit — real PageSpeed, SEO, and Core Web
               Vitals data on your own site in under a minute. No sales call,
               no obligation, just the numbers.
@@ -472,22 +475,24 @@ export default function ExitIntentPopup() {
             <Link
               href="/website-audit"
               onClick={handleAuditClick}
-              className="rc-mono w-full mt-6 flex items-center justify-center gap-2 text-sm font-medium uppercase tracking-wider px-6 py-4 text-white bg-[var(--rc-ink)] hover:bg-[var(--rc-circuit)] transition text-center"
+              className="mt-6 w-full flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-wide px-6 py-4 rounded-xl text-white bg-gray-900 hover:bg-gray-800 shadow-md transition text-center"
             >
               Run my free audit →
             </Link>
 
-            <div className="mt-6 pt-6 border-t border-[var(--rc-wire)]">
+            <div className="mt-8 pt-6 border-t border-gray-100">
               {status === "success" ? (
-                <p className="rc-mono text-sm text-[var(--rc-trace)] text-center py-2">
+                <p className="text-sm font-medium text-green-600 text-center py-2 bg-green-50 rounded-lg">
                   Got it — check your inbox shortly.
                 </p>
               ) : (
                 <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3">
-                  <label htmlFor="exit-popup-email" className="rc-mono text-[0.7rem] text-[var(--rc-ink-soft)]">
+                  <label htmlFor="exit-popup-email" className="text-sm font-medium text-gray-700">
                     Not now — just email me the SEO checklist instead
                   </label>
-                  <div className="flex flex-col sm:flex-row gap-2">
+                  
+                  {/* Stacked Form matching the modern layout */}
+                  <div className="flex flex-col gap-3">
                     <input
                       id="exit-popup-email"
                       type="email"
@@ -495,29 +500,30 @@ export default function ExitIntentPopup() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@company.com"
-                      className="rc-body w-full flex-1 min-w-0 border border-[var(--rc-wire)] bg-white px-4 py-3 text-sm text-[var(--rc-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--rc-circuit)]"
+                      className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition"
                     />
                     <button
                       type="submit"
                       disabled={status === "loading"}
-                      className="rc-mono w-full sm:w-auto text-xs font-medium uppercase tracking-wider px-6 py-3 border border-[var(--rc-ink)] text-[var(--rc-ink)] hover:bg-[var(--rc-ink)] hover:text-white transition whitespace-nowrap disabled:opacity-50"
+                      className="w-full text-sm font-bold uppercase tracking-wide px-6 py-3.5 rounded-xl border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition disabled:opacity-50"
                     >
-                      {status === "loading" ? "Sending…" : "Send"}
+                      {status === "loading" ? "Sending…" : "Send Checklist"}
                     </button>
                   </div>
                   {status === "error" && (
-                    <p className="text-xs text-red-600 mt-1">Could not submit — please try again.</p>
+                    <p className="text-xs font-medium text-red-500 mt-1">Could not submit — please try again.</p>
                   )}
                 </form>
               )}
             </div>
 
-            <p className="rc-mono text-[0.65rem] text-[rgba(42,45,53,0.55)] mt-5 text-center sm:text-left leading-relaxed">
-              Serving founders in India, the USA, UK, Canada & Australia. No spam, ever.
+            <p className="text-xs text-gray-400 mt-6 text-center leading-relaxed font-mono">
+              Serving founders in India, the USA, UK, Canada & Australia.<br className="hidden sm:block"/> No spam, ever.
             </p>
           </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
   );
+}
 }
