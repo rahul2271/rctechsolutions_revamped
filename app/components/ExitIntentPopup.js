@@ -312,7 +312,7 @@ function writeState(patch) {
     const current = readState();
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...current, ...patch }));
   } catch {
-    /* localStorage unavailable — fail silently */
+    /* localStorage unavailable */
   }
 }
 
@@ -436,14 +436,15 @@ export default function ExitIntentPopup() {
           onClick={handleClose}
         >
           <motion.div
-            className="relative w-full max-w-lg max-h-[95dvh] overflow-y-auto bg-white rounded-[24px] shadow-2xl p-6 sm:p-8"
+            /* THE FIX: Using w-[92vw] forces it to take up 92% of the screen on mobile, overriding any shrinking constraints */
+            className="relative w-[92vw] sm:w-[480px] max-w-[480px] max-h-[90dvh] overflow-y-auto bg-white rounded-[24px] shadow-2xl p-6 sm:p-8"
             initial={{ scale: 0.95, y: 15, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.95, y: 15, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 280 }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close Button Matching the Target Design */}
+            {/* Close Button */}
             <button
               onClick={handleClose}
               aria-label="Close"
@@ -454,19 +455,19 @@ export default function ExitIntentPopup() {
               </svg>
             </button>
 
-            {/* Target Design Eyebrow */}
+            {/* Red Dot Eyebrow */}
             <div className="flex items-center gap-2 mb-3">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-              <span className="text-xs font-bold tracking-widest text-red-500 uppercase">
-                Before you go
+              <span className="w-2.5 h-2.5 rounded-full bg-[#ff4a22]"></span>
+              <span className="text-[11px] font-bold tracking-widest text-[#ff4a22] uppercase">
+                Limited Time Opportunity
               </span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight pr-6">
+            <h2 className="text-[22px] sm:text-[28px] font-extrabold text-gray-900 leading-[1.1] pr-4">
               Want to know what's actually slowing your site down?
             </h2>
 
-            <p className="text-sm sm:text-base text-gray-600 mt-3 leading-relaxed">
+            <p className="text-[15px] text-gray-600 mt-3 leading-relaxed">
               Run our free instant audit — real PageSpeed, SEO, and Core Web
               Vitals data on your own site in under a minute. No sales call,
               no obligation, just the numbers.
@@ -475,24 +476,26 @@ export default function ExitIntentPopup() {
             <Link
               href="/website-audit"
               onClick={handleAuditClick}
-              className="mt-6 w-full flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-wide px-6 py-4 rounded-xl text-white bg-gray-900 hover:bg-gray-800 shadow-md transition text-center"
+              className="mt-5 w-full flex items-center justify-center gap-2 text-[13px] font-bold uppercase tracking-wider px-6 py-4 rounded-xl text-white bg-[#254F42] hover:bg-[#1a3a30] shadow-md transition text-center"
             >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
               Run my free audit →
             </Link>
 
-            <div className="mt-8 pt-6 border-t border-gray-100">
+            <div className="mt-6 pt-5 border-t border-gray-100">
               {status === "success" ? (
-                <p className="text-sm font-medium text-green-600 text-center py-2 bg-green-50 rounded-lg">
+                <p className="text-sm font-medium text-[#254F42] text-center py-2 bg-[#254F42]/10 rounded-lg">
                   Got it — check your inbox shortly.
                 </p>
               ) : (
                 <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3">
-                  <label htmlFor="exit-popup-email" className="text-sm font-medium text-gray-700">
+                  <label htmlFor="exit-popup-email" className="text-[13px] font-medium text-gray-700">
                     Not now — just email me the SEO checklist instead
                   </label>
                   
-                  {/* Stacked Form matching the modern layout */}
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2.5">
                     <input
                       id="exit-popup-email"
                       type="email"
@@ -500,12 +503,12 @@ export default function ExitIntentPopup() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@company.com"
-                      className="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition"
+                      className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-[15px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#254F42] focus:border-transparent transition"
                     />
                     <button
                       type="submit"
                       disabled={status === "loading"}
-                      className="w-full text-sm font-bold uppercase tracking-wide px-6 py-3.5 rounded-xl border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition disabled:opacity-50"
+                      className="w-full text-[13px] font-bold uppercase tracking-wider px-6 py-3.5 rounded-xl border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition disabled:opacity-50"
                     >
                       {status === "loading" ? "Sending…" : "Send Checklist"}
                     </button>
@@ -517,8 +520,8 @@ export default function ExitIntentPopup() {
               )}
             </div>
 
-            <p className="text-xs text-gray-400 mt-6 text-center leading-relaxed font-mono">
-              Serving founders in India, the USA, UK, Canada & Australia.<br className="hidden sm:block"/> No spam, ever.
+            <p className="text-[11px] text-gray-400 mt-5 text-center leading-relaxed font-mono">
+              No spam · Transparent data · Based in Mohali, Punjab
             </p>
           </motion.div>
         </motion.div>
@@ -526,4 +529,3 @@ export default function ExitIntentPopup() {
     </AnimatePresence>
   );
 }
-
