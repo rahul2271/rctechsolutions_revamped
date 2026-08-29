@@ -26,6 +26,13 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 
+// The site header is `sticky top-0 z-[998]` (see Header.js), and its mobile
+// menu overlay sits at z-index 9990. This popup must render above BOTH or
+// the header bar bleeds through on top of it. z-[9995] clears the header
+// and the mobile menu, while staying under the decorative cursor ring
+// (z-[9999], pointer-events:none, harmless either way).
+const POPUP_Z = "z-[9995]";
+
 const STORAGE_KEY = "rc_exit_popup_v1";
 const MIN_DWELL_MS = 8000;
 const TIME_FALLBACK_MS = 30000;
@@ -70,6 +77,7 @@ export default function ExitIntentPopup() {
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [status, setStatus] = useState(""); // "", "loading", "success", "error"
   const shownRef = useRef(false);
 
@@ -135,21 +143,21 @@ export default function ExitIntentPopup() {
     writeState({ dismissedAt: Date.now() });
   }
 
-  function handleAuditClick() {
+  function handleServiceLinkClick() {
     writeState({ dismissedAt: Date.now() });
     setVisible(false);
   }
 
-  async function handleEmailSubmit(e) {
+  async function handleLeadSubmit(e) {
     e.preventDefault();
-    if (!email) return;
+    if (!email && !phone) return;
     setStatus("loading");
     try {
       const res = await fetch(SHEETDB_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          data: { email, source: "exit_intent_popup", page: pathname },
+          data: { email, phone, source: "exit_intent_popup", page: pathname },
         }),
       });
       if (res.ok) {
@@ -170,7 +178,7 @@ export default function ExitIntentPopup() {
     <AnimatePresence>
       {visible && (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6"
+          className={`fixed inset-0 ${POPUP_Z} flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -202,7 +210,7 @@ export default function ExitIntentPopup() {
             <div className="flex items-center gap-2 mb-3 pr-8">
               <span className="w-2.5 h-2.5 rounded-full bg-[#ff4a22] shrink-0"></span>
               <span className="text-[11px] font-bold tracking-widest text-[#ff4a22] uppercase">
-                Free Website Audit
+                Free Consultation
               </span>
             </div>
 
@@ -210,64 +218,68 @@ export default function ExitIntentPopup() {
               id="exit-popup-heading"
               className="text-[21px] sm:text-[26px] font-extrabold text-gray-900 leading-[1.2] pr-6"
             >
-              Want to know what&apos;s actually slowing your site down?
+              Building a website? Let&apos;s talk before you go.
             </h2>
 
             <p className="text-[14px] sm:text-[15px] text-gray-600 mt-3 leading-relaxed">
-              Run our free instant audit — real PageSpeed, SEO, and Core Web
-              Vitals data on your own site in under a minute. No sales call,
-              no obligation, just the numbers.
+              Fixed-price, SEO-built websites with a 90+ PageSpeed guarantee.
+              Leave your email or phone and we&apos;ll reach out — no sales
+              pressure, just a straight answer on scope and pricing.
             </p>
 
-            <Link
-              href="/website-audit"
-              onClick={handleAuditClick}
-              className="mt-5 w-full flex items-center justify-center gap-2 text-[13px] font-bold uppercase tracking-wider px-6 py-4 rounded-xl text-white bg-[#254F42] hover:bg-[#1a3a30] shadow-md transition text-center"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              Run my free audit →
-            </Link>
-
-            <div className="mt-6 pt-5 border-t border-gray-100">
+            <div className="mt-5">
               {status === "success" ? (
-                <p className="text-sm font-medium text-[#254F42] text-center py-2 bg-[#254F42]/10 rounded-lg">
-                  Got it — check your inbox shortly.
+                <p className="text-sm font-medium text-[#254F42] text-center py-3 bg-[#254F42]/10 rounded-lg">
+                  Got it — we&apos;ll be in touch shortly.
                 </p>
               ) : (
-                <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3">
-                  <label htmlFor="exit-popup-email" className="text-[13px] font-medium text-gray-700">
-                    Not now — just email me the SEO checklist instead
-                  </label>
+                <form onSubmit={handleLeadSubmit} className="flex flex-col gap-3">
+                  <label htmlFor="exit-popup-email" className="sr-only">Email address</label>
+                  <input
+                    id="exit-popup-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@company.com"
+                    className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-[15px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#254F42] focus:border-transparent transition"
+                  />
 
-                  <div className="flex flex-col gap-2.5">
-                    <input
-                      id="exit-popup-email"
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="you@company.com"
-                      className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-[15px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#254F42] focus:border-transparent transition"
-                    />
-                    <button
-                      type="submit"
-                      disabled={status === "loading"}
-                      className="w-full text-[13px] font-bold uppercase tracking-wider px-6 py-3.5 rounded-xl border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition disabled:opacity-50"
-                    >
-                      {status === "loading" ? "Sending…" : "Send Checklist"}
-                    </button>
-                  </div>
+                  <label htmlFor="exit-popup-phone" className="sr-only">Phone number</label>
+                  <input
+                    id="exit-popup-phone"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+91 98765 43210 (optional)"
+                    className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-[15px] text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#254F42] focus:border-transparent transition"
+                  />
+
+                  <button
+                    type="submit"
+                    disabled={status === "loading" || (!email && !phone)}
+                    className="w-full text-[13px] font-bold uppercase tracking-wider px-6 py-4 rounded-xl text-white bg-[#254F42] hover:bg-[#1a3a30] shadow-md transition disabled:opacity-50"
+                  >
+                    {status === "loading" ? "Sending…" : "Get My Free Quote"}
+                  </button>
                   {status === "error" && (
-                    <p className="text-xs font-medium text-red-500 mt-1">Could not submit — please try again.</p>
+                    <p className="text-xs font-medium text-red-500">Could not submit — please try again.</p>
                   )}
                 </form>
               )}
             </div>
 
+            <div className="mt-5 pt-5 border-t border-gray-100 text-center">
+              <Link
+                href="/services/web-development"
+                onClick={handleServiceLinkClick}
+                className="text-[13px] font-semibold text-[#254F42] hover:text-[#ff4a22] underline underline-offset-2 transition"
+              >
+                Or see our Web Development services →
+              </Link>
+            </div>
+
             <p className="text-[11px] text-gray-400 mt-5 text-center leading-relaxed font-mono">
-              No spam · Transparent data · Based in Mohali, Punjab
+              No spam · Based in Mohali, Punjab
             </p>
           </motion.div>
         </motion.div>
