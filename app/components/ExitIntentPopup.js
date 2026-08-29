@@ -526,4 +526,4 @@ export default function ExitIntentPopup() {
     </AnimatePresence>
   );
 }
-}
+
