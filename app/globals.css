@@ -845,15 +845,19 @@ li, .btn, .trial-btn, .toggle-bar {
 /* Hover effect on the CTA button */
 
 
-/* Sticky CTA button for mobile-first optimization */
-@media (max-width: 768px) {
-  .fixed {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-}
+/* NOTE: a global "@media (max-width:768px) { .fixed { ... } }" rule used to
+   live here. It targeted Tailwind's bare `.fixed` utility class instead of a
+   scoped class, so on every mobile viewport it silently hijacked position,
+   width and centering for ALL fixed-position elements sitewide — not just
+   its intended target. That's what was squashing the exit-intent popup (and
+   every other `fixed inset-0` modal: ThankYouModal, ModalForm,
+   PortfolioItems, HeroSection lightbox) into a ~50%-width, bottom-anchored,
+   translateX(-50%) box on mobile. The one component it was actually meant
+   for (the mobile sticky call/WhatsApp bar in app/services/web-development/
+   web.js) already sets its own full `fixed bottom-0 left-0 w-full` classes
+   directly and never needed this rule. Removed rather than rescoped, since
+   nothing depends on it.
+*/
 
 
 /* styles/globals.css */
