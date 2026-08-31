@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation'; // Added useRouter import
+import { useRouter } from 'next/navigation';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { verifyRecaptcha } from '../../lib/verifyRecaptcha';
 import {
@@ -24,12 +24,26 @@ import {
 } from 'react-icons/ri';
 
 // ─── Utility for Google Ads Tracking ──────────────────────────────────────────
-const trackConversion = (type) => {
+const trackConversion = (type, url = undefined) => {
   if (typeof window !== 'undefined' && window.gtag) {
     if (type === 'call') {
       window.gtag('event', 'conversion', { 'send_to': 'AW-18337263682/IDSZCMXRlOMcEMLg8adE' });
     } else if (type === 'form') {
       window.gtag('event', 'conversion', { 'send_to': 'AW-18337263682/Yp7KCMrs7eIcEMLg8adE' });
+    } else if (type === 'submit_lead_4') {
+      // New snippet integrated here
+      const callback = function () {
+        if (typeof(url) != 'undefined') {
+          window.location = url;
+        }
+      };
+      
+      window.gtag('event', 'conversion', {
+          'send_to': 'AW-18337263682/THwECOfOg-scEMLg8adE',
+          'value': 1.0,
+          'currency': 'INR',
+          'event_callback': callback
+      });
     }
   }
 };
@@ -44,7 +58,7 @@ function ModalPortal({ children }) {
 
 // ─── Inline lead form (Optimized for Less Friction) ───────────────────────
 function LeadForm({ heading, sub, defaultService = 'Web Development' }) {
-  const router = useRouter(); // Initialize router for redirection
+  const router = useRouter(); 
 
   const [d, setD] = useState({ 
     name: '', 
@@ -81,8 +95,6 @@ function LeadForm({ heading, sub, defaultService = 'Web Development' }) {
       setStatus('idle');
       return;
     }
-
-    trackConversion('form');
     
     try {
       const formFillTime = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
@@ -102,7 +114,13 @@ function LeadForm({ heading, sub, defaultService = 'Web Development' }) {
       
       if (res.ok) {
         setStatus('done');
-        router.push('/thank-you'); // Redirects to the thank you page for tracking
+        
+        // Firing both conversions to ensure tracking coverage for the new snippet
+        trackConversion('form'); 
+        trackConversion('submit_lead_4');
+        
+        // Client-side routing to thank you page
+        router.push('/thank-you'); 
       } else {
         setStatus('error');
       }
@@ -324,6 +342,147 @@ function CaseStudyModal({ caseStudy, onClose }) {
   }, []);
 
   if (!mounted || !caseStudy) return null;
+
+  return createPortal(
+    <div 
+      style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 99999, backgroundColor: 'rgba(0,0,0,0.65)' }} 
+      className="flex items-center justify-center p-2 sm:p-5 backdrop-blur-sm"
+    >
+      <motion.div 
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        className="bg-white rounded-2xl w-full max-w-2xl p-4 sm:p-6 relative border-2 border-[var(--rc-trace)] shadow-2xl overflow-y-auto max-h-[95vh]"
+      >
+        <button 
+          onClick={onClose}
+          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-[var(--rc-paper)] flex items-center justify-center text-[var(--rc-ink)] hover:bg-[var(--rc-wire)] transition-colors z-20 shadow-sm"
+          aria-label="Close modal"
+        >
+          <RiCloseLine size={20} />
+        </button>
+
+        <div className="pr-8">
+          <div className="flex flex-wrap gap-1.5 mb-2 mt-1">
+            <span className="rc-mono text-[0.6rem] font-semibold px-2 py-0.5 rounded bg-[var(--rc-paper)] text-[var(--rc-ink)] border border-[var(--rc-wire)]">{caseStudy.industry}</span>
+            <span className="rc-mono text-[0.6rem] font-semibold px-2 py-0.5 rounded bg-[var(--rc-circuit)]/10 text-[var(--rc-circuit)]">{caseStudy.tag}</span>
+          </div>
+          <h3 className="rc-display text-xl sm:text-2xl font-bold text-[var(--rc-ink)] leading-tight mb-1">{caseStudy.result}</h3>
+        </div>
+
+        <p className="rc-mono text-[0.65rem] sm:text-xs font-bold uppercase tracking-wider text-[var(--rc-trace)] mb-3 flex items-start gap-1">
+          <RiFlashlightLine size={14} className="flex-shrink-0 mt-0.5" />
+          <span className="leading-snug">{caseStudy.highlight}</span>
+        </p>
+
+        <div className="relative h-40 sm:h-56 w-full rounded-xl overflow-hidden mb-4 bg-[var(--rc-paper-deep)] border border-[var(--rc-wire)]">
+          <Image src={caseStudy.image} alt={caseStudy.result} fill className="object-cover" sizes="(max-width:768px) 100vw, 600px" />
+        </div>
+
+        <h4 className="rc-mono text-[0.7rem] uppercase tracking-wider text-[var(--rc-ink)] font-bold mb-1">Project Story & Challenge:</h4>
+        <p className="rc-body text-xs sm:text-sm text-[var(--rc-ink-soft)] leading-relaxed mb-4">
+          {caseStudy.desc} We engineered a robust, lightning-fast architecture using Next.js to achieve record-breaking metrics.
+        </p>
+
+        <div className="grid grid-cols-3 gap-2 p-3 bg-[var(--rc-paper)] rounded-xl border border-[var(--rc-wire)] mb-4">
+          {caseStudy.metrics.map(m => (
+            <div key={m.l} className="text-center flex flex-col justify-center">
+              <p className="rc-display text-lg sm:text-xl font-extrabold text-[var(--rc-ink)]">{m.v}</p>
+              <p className="rc-mono text-[0.55rem] sm:text-[0.6rem] text-[var(--rc-ink-soft)] uppercase tracking-wider mt-0.5 leading-tight">{m.l}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="pt-3 border-t border-[var(--rc-wire)]">
+          <LeadForm heading="Get Similar Results" sub="" defaultService={`${caseStudy.industry} Case Study`} />
+        </div>
+      </motion.div>
+    </div>,
+    document.body
+  );
+}
+
+// ─── Testimonials Data ──────────────────────────────────────────────────────────
+const TESTIMONIALS = [
+  { name: "Dr. Vikram Sharma", role: "Founder, Vaidya ERP & Health Clinics", rating: 5, text: "RC Tech Solutions built our entire clinic management software and hospital dashboard from scratch. Their expertise in Next.js and secure databases is unmatched in Mohali and Chandigarh. 100% recommended!", location: "Chandigarh", verified: true },
+  { name: "Simranpreet Kaur", role: "Director, Luxury D2C Skincare Brand", rating: 5, text: "Our e-commerce store speed jumped from 4 seconds to under 1 second after Rahul and his team rebuilt it. Organic traffic doubled within 3 months with zero ad spend. Absolutely blown away!", location: "Mohali", verified: true },
+  { name: "Advocate Rajesh Malhotra", role: "Managing Partner, Malhotra & Associates", rating: 5, text: "Before hiring RC Tech Solutions, we were paying an agency that disappeared. These guys delivered our legal practice website ahead of schedule with transparent pricing and stellar communication.", location: "Ludhiana", verified: true },
+  { name: "Ankit Aggarwal", role: "CTO, LogiMove Freight Solutions", rating: 4.8, text: "Exceptional frontend architecture and API integration work. They handled complex logistics tracking dashboards cleanly and professionally. Will continue working with them for phase 2.", location: "Delhi NCR", verified: true },
+  { name: "Pooja Deshmukh", role: "Owner, Studio Bloom Salons", rating: 5, text: "Transparent quotes, no hidden surprises, and incredible mobile responsiveness. Our booking conversion rate increased by 3x right after launch.", location: "Mohali", verified: true },
+  { name: "Gurpreet Singh", role: "CEO, Punjab Agro Exports", rating: 4.5, text: "Very reliable web development agency based right here in Punjab. Honest advice, transparent milestones, and superb PageSpeed scores.", location: "Amritsar", verified: true }
+];
+
+const HERO_SLIDES = [
+  { eyebrow: "Best Website Designing Company in Mohali", headlineLine1: "Professional", headlineGreen: "Website Designing", headlineLine2: "& Web Development", headlineLine3: "Company in Mohali", description: "Custom, fast, mobile-friendly, SEO-optimized websites that drive results. Trusted by 3450+ businesses. 700+ websites delivered. 13+ years of proven expertise.", tags: ["Google Certified", "4.8 Rating (530+ Reviews)", "ISO Registered", "3450+ Happy Clients"], stats: [{ value: "700+", label: "Websites Delivered" }, { value: "13+", label: "Years Experience" }] },
+  { eyebrow: "Top Rated Web Development Agency", headlineLine1: "High-Performance", headlineGreen: "Website", headlineLine2: "Development with", headlineOrange: "SEO Optimization Services", description: "PageSpeed 95+ scores, 100% mobile responsive, Google-ranked websites. Better speed = higher conversions. Launch your online presence rapidly.", tags: ["ISO Certified", "530+ Google Reviews", "Fast Hosting Included", "Lifetime Support"], stats: [{ value: "95+", label: "PageSpeed Score" }, { value: "100%", label: "Mobile Responsive" }] },
+  { eyebrow: "E-commerce Website Experts", headlineLine1: "E-commerce", headlineGreen: "Website", headlineLine2: "Development with", headlineOrange: "Payment Integration", description: "Complete e-commerce solutions with Shopify, WooCommerce, and custom builds. Payment gateways, inventory management, and admin panels included.", tags: ["Shopify Certified Partner", "PCI Compliant", "Multi-Currency Support"], stats: [{ value: "200+", label: "E-commerce Stores" }, { value: "7-10", label: "Days Launch" }] },
+  { eyebrow: "Landing Page Specialists", headlineLine1: "High-Converting", headlineGreen: "Landing Pages", headlineLine2: "for", headlineOrange: "Lead Generation", description: "Conversion-optimized landing pages with A/B testing, lead forms, and analytics. Average 3x ROI increase. Perfect for Google Ads and Facebook campaigns.", tags: ["Google Ads Certified", "CRO Expert", "Real-Time Analytics"], stats: [{ value: "3x", label: "Average ROI" }, { value: "500+", label: "Campaigns Managed" }] },
+  { eyebrow: "Custom Web Applications", headlineLine1: "Custom", headlineGreen: "Web", headlineGreen2: "Applications", headlineLine2: "built with", headlineOrange: "Modern Tech Stack", description: "SaaS platforms, dashboards, and enterprise applications. React, Node.js, databases. Scalable, secure, and production-ready code.", tags: ["React & Node.js Certified", "Cloud-Ready", "Enterprise Grade"], stats: [{ value: "150+", label: "Applications Built" }, { value: "4.5+", label: "Avg Client Rating" }] }
+];
+
+const SERVICES = [
+  { title: 'Business Website', icon: RiPaintBrushLine, time: '2–3 weeks', desc: 'Brand-aligned, mobile-first business sites on Next.js. 90+ PageSpeed guaranteed. Every page indexed.', slug: null },
+  { title: 'Web Application', icon: RiAppsLine, time: '4–8 weeks', desc: 'Custom dashboards, SaaS products, and web apps with authentication, real-time data, and multi-role access.', slug: null },
+  { title: 'E-commerce Store', icon: RiShoppingCartLine, time: '4–8 weeks', desc: 'Shopify or custom storefronts with Razorpay + UPI + COD, GST-compliant invoicing, and abandoned cart flows.', slug: 'ecommerce-development' },
+  { title: 'Web Portal', icon: RiLayoutGridLine, time: '6–10 weeks', desc: 'Multi-role portals — vendor dashboards, student/teacher portals, booking systems, and admin panels.', slug: null },
+  { title: 'Progressive Web App', icon: RiSmartphoneLine, time: '4–6 weeks', desc: 'Installable, offline-capable apps that work like native mobile apps without App Store fees.', slug: 'progressive-web-apps' },
+  { title: 'Custom CMS', icon: RiSettings3Line, time: '3–5 weeks', desc: 'Headless CMS with Sanity, Firebase, or Strapi — built around how your team actually publishes content.', slug: 'custom-cms-development' },
+  { title: 'Front-end Development', icon: RiCodeSSlashLine, time: '2–4 weeks', desc: 'React / Next.js front-ends with Framer Motion animations, accessible markup, and Lighthouse 90+ scores.', slug: null },
+  { title: 'Back-end & API', icon: RiDatabase2Line, time: '3–6 weeks', desc: 'Node.js, Firebase, and REST API backends built for scale. Authentication, payments, and integrations.', slug: null },
+  { title: 'Maintenance Plan', icon: RiToolsLine, time: 'Ongoing', desc: 'Monthly security patches, performance audits, content updates, and 48-hour response time for bugs.', slug: null },
+];
+
+const PROBLEMS = [
+  { problem: 'Your current site loads in 5+ seconds on mobile', fix: 'We rebuild on Next.js with static generation, WebP images, and Mumbai CDN. Our clients average 1.3s LCP after rebuild.' },
+  { problem: 'Google can\'t find your pages', fix: 'We set up Search Console, submit a proper sitemap, add JSON-LD schema, and verify every page is indexed within 14 days.' },
+  { problem: 'You paid a premium for a WordPress site that looks like a template', fix: 'We build from scratch, on brand, on Next.js. No Elementor, no Divi, no 40-plugin WordPress installs.' },
+  { problem: 'Your site looks bad on mobile', fix: 'Mobile-first development. Every component is tested on real Android and iOS devices before delivery, not just browser DevTools.' },
+  { problem: 'You don\'t know what\'s actually happening on your site', fix: 'We set up GA4, Google Search Console, and heatmap tracking so you see exactly what users do — and what they don\'t.' },
+  { problem: 'The last agency disappeared after taking payment', fix: 'Transparent weekly progress updates, a shared staging URL from day 5, and 30 days of post-launch support. All in writing before we start.' },
+];
+
+const INDUSTRIES = [
+  { title: 'On Demand Solutions', icon: RiToolsLine, desc: 'Instant service platforms, booking management, and live dispatch apps.', image: '/On%20Demand%20Solutions.png' },
+  { title: 'E-Commerce', icon: RiShoppingCartLine, desc: 'High-converting online storefronts with integrated payment gateways.', image: '/e-commerce.png' },
+  { title: 'Dating & Matrimonial', icon: RiHeartPulseLine, desc: 'Secure matchmaking platforms with advanced profile matching algorithms.', image: '/Dating%20%26%20Matrimonial.png' },
+  { title: 'Real Estate & Property', icon: RiBuilding4Line, desc: 'Property listing portals, virtual tours, and CRM integrations.', image: '/Real%20Estate%20%26%20Property.png' },
+  { title: 'Travel & Tourism', icon: RiPlaneLine, desc: 'Flight booking engines, tour packages, and itinerary planners.', image: '/Travel%20%26%20Tourism.png' },
+  { title: 'Restaurant', icon: RiRestaurantLine, desc: 'Online food ordering systems, table reservations, and POS sync.', image: '/Restaurant.png' },
+  { title: 'Healthcare', icon: RiHeartPulseLine, desc: 'Telehealth apps, patient management systems, and clinic software.', image: '/Healthcare.png' },
+  { title: 'Finance', icon: RiMoneyDollarCircleLine, desc: 'Fintech portals, secure payment solutions, and investment trackers.', image: '/Finance.png' },
+  { title: 'Education', icon: RiGraduationCapLine, desc: 'LMS platforms, student examination portals, and online tutoring.', image: '/Education.png' },
+  { title: 'Events', icon: RiCalendarEventLine, desc: 'Event ticketing platforms, schedule managers, and attendee portals.', image: '/Events.png' },
+  { title: 'Personal Care & Beauty', icon: RiScissorsLine, desc: 'Salon booking systems, appointment management, and product sales.', image: '/Personal%20Care%20%26%20Beauty.png' },
+  { title: 'Banking', icon: RiBankLine, desc: 'Secure banking dashboards, account management, and transaction flows.', image: '/Banking.png' },
+  { title: 'Oil and Gas', icon: RiOilLine, desc: 'Industrial asset tracking, monitoring dashboards, and logistics control.', image: '/Oil%20and%20Gas.png' },
+  { title: 'Manufacturing', icon: RiCpuLine, desc: 'ERP systems, supply chain dashboards, and resource planning.', image: '/Manufacturing.png' },
+  { title: 'Logistics and Transportation', icon: RiTruckLine, desc: 'Fleet management, live shipment tracking, and route optimization.', image: '/Logistics%20and%20Transportation.png' },
+  { title: 'Insurance', icon: RiShieldCheckLine, desc: 'Policy management portals, claim processing apps, and quotation calculators.', image: '/Insurance.png' },
+  { title: 'EV', icon: RiChargingPileLine, desc: 'Charging station locators, battery telemetry, and booking systems.', image: '/EV.png' },
+  { title: 'Entertainment & Media', icon: RiFilmLine, desc: 'Video streaming platforms, content publishing portals, and fan apps.', image: '/images/service-web.svg' },
+  { title: 'Aviation', icon: RiPlaneLine, desc: 'Flight operations software, booking systems, and crew management.', image: '/images/service-web.svg' },
+  { title: 'Automotive', icon: RiCarLine, desc: 'Car dealership portals, service booking tools, and parts catalogs.', image: '/images/service-web.svg' },
+  { title: 'Agriculture', icon: RiPlantLine, desc: 'Smart farming IoT dashboards, crop monitoring, and supply apps.', image: '/images/service-web.svg' },
+  { title: 'Social Media', icon: RiShareLine, desc: 'Community networks, content sharing feeds, and user profiles.', image: '/images/service-web.svg' },
+  { title: 'SAAS', icon: RiCloudLine, desc: 'Scalable multi-tenant cloud software platforms and dashboards.', image: '/images/service-web.svg' },
+  { title: 'Sports', icon: RiTrophyLine, desc: 'Tournament management, score tracking apps, and fan communities.', image: '/images/service-web.svg' },
+  { title: 'Fitness & Wellness', icon: RiPulseLine, desc: 'Workout planners, gym membership portals, and health trackers.', image: '/images/service-web.svg' }
+];
+
+const PROCESS = [
+  { n: '01', title: 'Discovery call (30 min, free)', desc: 'We ask about your goals, users, timeline, and budget. You ask us anything. We\'ll tell you honestly whether we\'re the right fit.' },
+  { n: '02', title: 'Written proposal in 48 hours', desc: 'A transparent quote, a detailed scope, and a project timeline with weekly milestones. Clear and honest estimates.' },
+  { n: '03', title: 'Design + dev sprints with weekly updates', desc: 'Work in 1-week sprints. Every Friday you get a progress update. From week 2, there\'s a live staging URL you can visit any time.' },
+  { n: '04', title: 'Pre-launch 47-point audit', desc: 'PageSpeed 90+ verified, all pages indexed, forms tested, redirects confirmed, security headers checked. Only then do we go live.' },
+  { n: '05', title: 'Launch day — you\'re present', desc: 'We do launches live, with you on a call. We go through the checklist together and push the deployment in front of you.' },
+  { n: '06', title: '30-day post-launch support included', desc: 'Bug fixes and minor changes at no extra cost for 30 days. 24-hour response time. Documentation so any developer can take over.' },
+];
+
+const CASE_STUDIES = [
+  { tag: 'Website Rebuild', industry: 'Legal Services', result: '7.3s → 1.2s load time', highlight: '+34% organic leads & 3x higher conversion', desc: 'Chandigarh law firm: WordPress → Next.js. PageSpeed 31 → 91. Contact form leads went from 0–1/week to 3–4/week in 90 days — high ROI conversion funnel.', image: '/law-firm-redesign.png', metrics: [{ v: '1.2s', l: 'Mobile LCP' }, { v: '91', l: 'PageSpeed' }, { v: '+34%', l: 'Leads' }] },
+  { tag: 'Full Build + SEO', industry: 'D2C Skincare & Retail', result: '0 → 12,000 monthly visitors', highlight: '₹0 ongoing ad spend with custom e-commerce', desc: 'Built from scratch on Next.js with keyword-targeted content and lightning-fast checkout flow. Organic traffic surpassed paid Instagram by month 6.', image: '/d2c-skincare-ecommerce.png', metrics: [{ v: '12K', l: 'Monthly visitors' }, { v: '6mo', l: 'To page 1' }, { v: '₹0', l: 'Ad spend' }] },
+  { tag: 'Clinic ERP & SaaS', industry: 'Healthcare & Medical', result: '100% Patient Workflow Automation', highlight: 'Custom built ERP platform launch', desc: 'Built a multi-tenant clinic management system handling appointments, digital prescriptions, and patient records securely.', image: '/healthcare-erp.png', metrics: [{ v: '100%', l: 'Automation' }, { v: 'Zero', l: 'Paperwork' }, { v: '10x', l: 'Efficiency' }] }
+];
 
   return createPortal(
     <div 
