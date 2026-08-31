@@ -19,33 +19,9 @@ import {
   RiScissorsLine, RiBankLine, RiOilLine, RiCpuLine, RiShieldCheckLine,
   RiChargingPileLine, RiFilmLine, RiCarLine, RiPlantLine, RiShareLine,
   RiCloudLine, RiTrophyLine, RiPulseLine, RiArrowLeftSLine, RiArrowRightSLine,
-  RiCloseLine, RiPhoneLine, RiMailSendLine, RiWhatsappLine, RiFlashlightLine,
+  RiCloseLine, RiPhoneLine, RiWhatsappLine, RiFlashlightLine,
   RiStarFill, RiFireLine, RiExternalLinkLine, RiGoogleFill
 } from 'react-icons/ri';
-
-// ─── Utility for Google Ads Tracking ──────────────────────────────────────────
-const trackConversion = (type, url = undefined) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    if (type === 'call') {
-      window.gtag('event', 'conversion', { 'send_to': 'AW-18337263682/IDSZCMXRlOMcEMLg8adE' });
-    } else if (type === 'form') {
-      window.gtag('event', 'conversion', { 'send_to': 'AW-18337263682/Yp7KCMrs7eIcEMLg8adE' });
-    } else if (type === 'submit_lead_4') {
-      const callback = function () {
-        if (typeof(url) != 'undefined') {
-          window.location = url;
-        }
-      };
-      
-      window.gtag('event', 'conversion', {
-          'send_to': 'AW-18337263682/THwECOfOg-scEMLg8adE',
-          'value': 1.0,
-          'currency': 'INR',
-          'event_callback': callback
-      });
-    }
-  }
-};
 
 // ─── React Portal Wrapper for Modals ─────────────────────────────────────────
 function ModalPortal({ children }) {
@@ -113,10 +89,6 @@ function LeadForm({ heading, sub, defaultService = 'Web Development' }) {
       
       if (res.ok) {
         setStatus('done');
-        
-        trackConversion('form'); 
-        trackConversion('submit_lead_4');
-        
         router.push('/thank-you'); 
       } else {
         setStatus('error');
@@ -185,7 +157,6 @@ function LeadForm({ heading, sub, defaultService = 'Web Development' }) {
         <div className="pt-2 sm:pt-3 border-t border-[var(--rc-wire)] grid grid-cols-2 gap-2">
           <a
             href="tel:+917009646377"
-            onClick={() => trackConversion('call')}
             className="rc-mono text-[0.7rem] sm:text-xs font-semibold py-2.5 px-2 border border-[var(--rc-wire)] bg-white text-[var(--rc-ink)] hover:border-[var(--rc-circuit)] hover:bg-[var(--rc-paper)] transition-all flex items-center justify-center gap-1 shadow-sm rounded-md"
           >
             <RiPhoneLine size={14} className="text-[var(--rc-trace)]" />
@@ -195,7 +166,6 @@ function LeadForm({ heading, sub, defaultService = 'Web Development' }) {
             href={getWhatsAppUrl()}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => trackConversion('whatsapp')}
             className="rc-mono text-[0.7rem] sm:text-xs font-semibold py-2.5 px-2 border border-[#25D366]/30 bg-[#25D366]/10 text-[#128C7E] hover:bg-[#25D366]/20 transition-all flex items-center justify-center gap-1 shadow-sm rounded-md"
           >
             <RiWhatsappLine size={15} className="text-[#25D366]" />
@@ -204,58 +174,6 @@ function LeadForm({ heading, sub, defaultService = 'Web Development' }) {
         </div>
       </form>
     </div>
-  );
-}
-
-// ─── Auto Popup Lead Modal ──────────────────────────────────────────────────
-function AutoLeadModal({ onClose }) {
-  const [mounted, setMounted] = useState(false);
-  
-  useEffect(() => {
-    setMounted(true);
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
-  }, []);
-
-  if (!mounted) return null;
-
-  return createPortal(
-    <div 
-      style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 99999, backgroundColor: 'rgba(0,0,0,0.65)' }} 
-      className="flex items-center justify-center p-2 sm:p-5 backdrop-blur-sm"
-    >
-      <motion.div 
-        initial={{ scale: 0.95, opacity: 0, y: 15 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.95, opacity: 0, y: 15 }}
-        className="bg-white rounded-2xl w-full max-w-md p-4 sm:p-6 relative border-[3px] border-[var(--rc-trace)] shadow-2xl overflow-y-auto max-h-[95vh]"
-      >
-        <button 
-          onClick={onClose}
-          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-[var(--rc-paper)] flex items-center justify-center text-[var(--rc-ink)] hover:bg-[var(--rc-wire)] transition-colors z-20 shadow-sm"
-          aria-label="Close modal"
-        >
-          <RiCloseLine size={20} />
-        </button>
-
-        <div className="flex items-center gap-2 mb-3 mt-1">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
-          </span>
-          <span className="rc-mono text-[0.65rem] sm:text-[0.7rem] uppercase tracking-wider text-[var(--rc-circuit)] font-bold">Limited Time Opportunity</span>
-        </div>
-
-        <div className="pt-0">
-          <LeadForm 
-            heading="Let's Build Something Great." 
-            sub="Drop your details below for a fast, free quote. Our expert team will respond within 24 hours." 
-            defaultService="General Web Development (Auto Lead)" 
-          />
-        </div>
-      </motion.div>
-    </div>,
-    document.body
   );
 }
 
@@ -502,7 +420,6 @@ export default function WebDevelopmentPage() {
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [selectedCaseStudy, setSelectedCaseStudy] = useState(null);
-  const [showAutoPopup, setShowAutoPopup] = useState(false);
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const [industryPage, setIndustryPage] = useState(0);
   const itemsPerPage = 8;
@@ -514,40 +431,6 @@ export default function WebDevelopmentPage() {
       setTestimonialIndex((prev) => (prev + 1) % TESTIMONIALS.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, []);
-
-  // SMART AUTO-POPUP LOGIC (Scroll Depth or 15-second delay, triggers only once)
-  useEffect(() => {
-    let timeoutId;
-    
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      
-      // If user scrolls past 50% of the page
-      if (scrollPosition + windowHeight > documentHeight * 0.5) {
-        if (!sessionStorage.getItem('popupShown')) {
-          setShowAutoPopup(true);
-          sessionStorage.setItem('popupShown', 'true');
-        }
-        window.removeEventListener('scroll', handleScroll);
-      }
-    };
-
-    if (!sessionStorage.getItem('popupShown')) {
-       window.addEventListener('scroll', handleScroll);
-       // Wait 15 seconds before popping up if they don't scroll
-       timeoutId = setTimeout(() => {
-          setShowAutoPopup(true);
-          sessionStorage.setItem('popupShown', 'true');
-       }, 15000); 
-    }
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if(timeoutId) clearTimeout(timeoutId);
-    };
   }, []);
 
   const slide = HERO_SLIDES[currentSlide];
@@ -565,7 +448,6 @@ export default function WebDevelopmentPage() {
   const generalWhatsAppUrl = "https://wa.me/917009646377?text=Hello%20RC%20Tech%20Solutions";
 
   return (
-    // Added pb-20 to ensure content isn't hidden behind the sticky footer on mobile
     <div className="min-h-screen pb-20 md:pb-0" style={{ background: 'var(--rc-paper)' }}>
 
       <style jsx global>{`
@@ -581,11 +463,6 @@ export default function WebDevelopmentPage() {
 
       {/* ── MODALS ── */}
       <ModalPortal>
-        <AnimatePresence>
-          {showAutoPopup && (
-            <AutoLeadModal onClose={() => setShowAutoPopup(false)} />
-          )}
-        </AnimatePresence>
         <AnimatePresence>
           {selectedIndustry && (
             <IndustryModal industry={selectedIndustry} onClose={() => setSelectedIndustry(null)} />
@@ -666,7 +543,6 @@ export default function WebDevelopmentPage() {
                 </a>
                 <a
                   href="tel:+917009646377"
-                  onClick={() => trackConversion('call')}
                   className="rc-mono text-xs font-bold uppercase tracking-wider px-8 py-4 text-[var(--rc-ink)] bg-white border-2 border-[var(--rc-circuit)] rounded-lg hover:bg-[var(--rc-paper)] transition-all transform hover:-translate-y-1 shadow-md flex items-center gap-2"
                 >
                   <RiPhoneLine size={16} className="text-[var(--rc-trace)]" />
@@ -987,7 +863,6 @@ export default function WebDevelopmentPage() {
                       </a>
                       <a 
                         href="tel:+917009646377" 
-                        onClick={() => trackConversion('call')}
                         className="inline-flex items-center gap-1.5 rc-mono text-xs font-bold text-[var(--rc-ink)] hover:text-[var(--rc-circuit)] transition-colors"
                       >
                         <RiPhoneLine size={16} className="text-[var(--rc-trace)]" />
@@ -1109,7 +984,6 @@ export default function WebDevelopmentPage() {
               href="https://wa.me/917009646377?text=Hello%20RC%20Tech%20Solutions" 
               target="_blank" 
               rel="noopener noreferrer"
-              onClick={() => trackConversion('whatsapp')}
               className="inline-flex items-center gap-1.5 rc-mono text-xs uppercase tracking-wider font-bold px-5 py-3 bg-[#25D366] text-white rounded-lg shadow hover:bg-[#128C7E] transition-all flex-shrink-0"
             >
               <RiWhatsappLine size={16} />
@@ -1218,11 +1092,11 @@ export default function WebDevelopmentPage() {
               <div className="p-6 bg-white rounded-2xl border-2 border-[var(--rc-trace)] shadow-lg space-y-4">
                 <p className="rc-mono text-xs uppercase tracking-wider font-bold text-[var(--rc-trace)]">Direct Expert Line (Mohali)</p>
                 <div className="flex flex-col gap-2">
-                  <a href="tel:+917009646377" onClick={() => trackConversion('call')} className="rc-display text-2xl font-bold text-[var(--rc-ink)] hover:text-[var(--rc-circuit)] transition-colors flex items-center gap-2">
+                  <a href="tel:+917009646377" className="rc-display text-2xl font-bold text-[var(--rc-ink)] hover:text-[var(--rc-circuit)] transition-colors flex items-center gap-2">
                     <RiPhoneLine size={20} className="text-[var(--rc-trace)]" />
                     <span>+91 70096-46377</span>
                   </a>
-                  <a href={generalWhatsAppUrl} target="_blank" rel="noopener noreferrer" onClick={() => trackConversion('whatsapp')}
+                  <a href={generalWhatsAppUrl} target="_blank" rel="noopener noreferrer"
                     className="rc-mono text-xs font-bold uppercase tracking-wider px-4 py-3 bg-[#25D366] text-white rounded-xl text-center hover:bg-[#128C7E] transition-all flex items-center justify-center gap-2 shadow">
                     <RiWhatsappLine size={18} />
                     <span>Chat Instantly on WhatsApp →</span>
@@ -1264,7 +1138,6 @@ export default function WebDevelopmentPage() {
       <div className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-[var(--rc-wire)] p-3 z-50 flex items-center gap-3 shadow-[0_-4px_15px_rgba(0,0,0,0.05)]">
         <a 
           href="tel:+917009646377" 
-          onClick={() => trackConversion('call')} 
           className="flex-1 bg-white border border-[var(--rc-trace)] text-[var(--rc-ink)] font-extrabold uppercase tracking-wider text-xs py-3.5 rounded-lg flex items-center justify-center gap-1.5 shadow-sm"
         >
           <RiPhoneLine size={16} className="text-[var(--rc-trace)]" /> Call Now
@@ -1273,7 +1146,6 @@ export default function WebDevelopmentPage() {
           href={generalWhatsAppUrl} 
           target="_blank" 
           rel="noopener noreferrer" 
-          onClick={() => trackConversion('whatsapp')} 
           className="flex-1 bg-[#25D366] text-white font-extrabold uppercase tracking-wider text-xs py-3.5 rounded-lg flex items-center justify-center gap-1.5 shadow-sm"
         >
           <RiWhatsappLine size={18} /> WhatsApp
