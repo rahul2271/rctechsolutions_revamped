@@ -31,7 +31,6 @@ const trackConversion = (type, url = undefined) => {
     } else if (type === 'form') {
       window.gtag('event', 'conversion', { 'send_to': 'AW-18337263682/Yp7KCMrs7eIcEMLg8adE' });
     } else if (type === 'submit_lead_4') {
-      // New snippet integrated here
       const callback = function () {
         if (typeof(url) != 'undefined') {
           window.location = url;
@@ -115,11 +114,9 @@ function LeadForm({ heading, sub, defaultService = 'Web Development' }) {
       if (res.ok) {
         setStatus('done');
         
-        // Firing both conversions to ensure tracking coverage for the new snippet
         trackConversion('form'); 
         trackConversion('submit_lead_4');
         
-        // Client-side routing to thank you page
         router.push('/thank-you'); 
       } else {
         setStatus('error');
@@ -130,7 +127,6 @@ function LeadForm({ heading, sub, defaultService = 'Web Development' }) {
     }
   };
 
-  // Redirecting state instead of WhatsApp UI
   if (status === 'done') return (
     <div className="text-center py-8">
       <div className="w-8 h-8 rounded-full border-4 border-t-[var(--rc-trace)] border-r-[var(--rc-trace)] border-b-[var(--rc-trace)] border-l-transparent animate-spin mx-auto mb-4"></div>
@@ -153,7 +149,6 @@ function LeadForm({ heading, sub, defaultService = 'Web Development' }) {
             className="w-full border border-[var(--rc-wire)] px-3 py-2.5 rc-body text-xs sm:text-sm text-[var(--rc-ink)] bg-white focus:outline-none focus:border-[var(--rc-circuit)] transition-colors rounded-md" />
         </div>
         
-        {/* Made Email and Message Optional to reduce bounce rate */}
         <input type="email" value={d.email} onChange={h('email')} placeholder="Email (Optional)" 
           className="w-full border border-[var(--rc-wire)] px-3 py-2.5 rc-body text-xs sm:text-sm text-[var(--rc-ink)] bg-white focus:outline-none focus:border-[var(--rc-circuit)] transition-colors rounded-md" />
         
@@ -402,7 +397,7 @@ function CaseStudyModal({ caseStudy, onClose }) {
   );
 }
 
-// ─── Testimonials Data ──────────────────────────────────────────────────────────
+// ─── Constants Data ─────────────────────────────────────────────────────────────
 const TESTIMONIALS = [
   { name: "Dr. Vikram Sharma", role: "Founder, Vaidya ERP & Health Clinics", rating: 5, text: "RC Tech Solutions built our entire clinic management software and hospital dashboard from scratch. Their expertise in Next.js and secure databases is unmatched in Mohali and Chandigarh. 100% recommended!", location: "Chandigarh", verified: true },
   { name: "Simranpreet Kaur", role: "Director, Luxury D2C Skincare Brand", rating: 5, text: "Our e-commerce store speed jumped from 4 seconds to under 1 second after Rahul and his team rebuilt it. Organic traffic doubled within 3 months with zero ad spend. Absolutely blown away!", location: "Mohali", verified: true },
@@ -481,70 +476,8 @@ const PROCESS = [
 const CASE_STUDIES = [
   { tag: 'Website Rebuild', industry: 'Legal Services', result: '7.3s → 1.2s load time', highlight: '+34% organic leads & 3x higher conversion', desc: 'Chandigarh law firm: WordPress → Next.js. PageSpeed 31 → 91. Contact form leads went from 0–1/week to 3–4/week in 90 days — high ROI conversion funnel.', image: '/law-firm-redesign.png', metrics: [{ v: '1.2s', l: 'Mobile LCP' }, { v: '91', l: 'PageSpeed' }, { v: '+34%', l: 'Leads' }] },
   { tag: 'Full Build + SEO', industry: 'D2C Skincare & Retail', result: '0 → 12,000 monthly visitors', highlight: '₹0 ongoing ad spend with custom e-commerce', desc: 'Built from scratch on Next.js with keyword-targeted content and lightning-fast checkout flow. Organic traffic surpassed paid Instagram by month 6.', image: '/d2c-skincare-ecommerce.png', metrics: [{ v: '12K', l: 'Monthly visitors' }, { v: '6mo', l: 'To page 1' }, { v: '₹0', l: 'Ad spend' }] },
-  { tag: 'Clinic ERP & SaaS', industry: 'Healthcare & Medical', result: '100% Patient Workflow Automation', highlight: 'Custom built ERP platform launch', desc: 'Built a multi-tenant clinic management system handling appointments, digital prescriptions, and patient records securely.', image: '/healthcare-erp.png', metrics: [{ v: '100%', l: 'Automation' }, { v: 'Zero', l: 'Paperwork' }, { v: '10x', l: 'Efficiency' }] }
+  { tag: 'Clinic ERP & SaaS', industry: 'Healthcare & Medical', result: '100% Patient Workflow Automation', highlight: 'Zero downtime scheduling & automated WhatsApp reminders', desc: 'Vaidya ERP platform launch: Custom multi-branch clinic management system built with real-time analytics and secure patient record handling.', image: '/vaidya-erp-dashoard.png', metrics: [{ v: '100%', l: 'Automated' }, { v: '0s', l: 'Downtime' }, { v: '5x', l: 'Faster Bookings' }] }
 ];
-
-  return createPortal(
-    <div 
-      style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 99999, backgroundColor: 'rgba(0,0,0,0.65)' }} 
-      className="flex items-center justify-center p-2 sm:p-5 backdrop-blur-sm"
-    >
-      <motion.div 
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white rounded-2xl w-full max-w-2xl p-4 sm:p-6 relative border-2 border-[var(--rc-trace)] shadow-2xl overflow-y-auto max-h-[95vh]"
-      >
-        <button 
-          onClick={onClose}
-          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-[var(--rc-paper)] flex items-center justify-center text-[var(--rc-ink)] hover:bg-[var(--rc-wire)] transition-colors z-20 shadow-sm"
-          aria-label="Close modal"
-        >
-          <RiCloseLine size={20} />
-        </button>
-
-        <div className="pr-8">
-          <div className="flex flex-wrap gap-1.5 mb-2 mt-1">
-            <span className="rc-mono text-[0.6rem] font-semibold px-2 py-0.5 rounded bg-[var(--rc-paper)] text-[var(--rc-ink)] border border-[var(--rc-wire)]">{caseStudy.industry}</span>
-            <span className="rc-mono text-[0.6rem] font-semibold px-2 py-0.5 rounded bg-[var(--rc-circuit)]/10 text-[var(--rc-circuit)]">{caseStudy.tag}</span>
-          </div>
-          <h3 className="rc-display text-xl sm:text-2xl font-bold text-[var(--rc-ink)] leading-tight mb-1">{caseStudy.result}</h3>
-        </div>
-
-        <p className="rc-mono text-[0.65rem] sm:text-xs font-bold uppercase tracking-wider text-[var(--rc-trace)] mb-3 flex items-start gap-1">
-          <RiFlashlightLine size={14} className="flex-shrink-0 mt-0.5" />
-          <span className="leading-snug">{caseStudy.highlight}</span>
-        </p>
-
-        <div className="relative h-40 sm:h-56 w-full rounded-xl overflow-hidden mb-4 bg-[var(--rc-paper-deep)] border border-[var(--rc-wire)]">
-          <Image src={caseStudy.image} alt={caseStudy.result} fill className="object-cover" sizes="(max-width:768px) 100vw, 600px" />
-        </div>
-
-        <h4 className="rc-mono text-[0.7rem] uppercase tracking-wider text-[var(--rc-ink)] font-bold mb-1">Project Story & Challenge:</h4>
-        <p className="rc-body text-xs sm:text-sm text-[var(--rc-ink-soft)] leading-relaxed mb-4">
-          {caseStudy.desc} We engineered a robust, lightning-fast architecture using Next.js to achieve record-breaking metrics.
-        </p>
-
-        <div className="grid grid-cols-3 gap-2 p-3 bg-[var(--rc-paper)] rounded-xl border border-[var(--rc-wire)] mb-4">
-          {caseStudy.metrics.map(m => (
-            <div key={m.l} className="text-center flex flex-col justify-center">
-              <p className="rc-display text-lg sm:text-xl font-extrabold text-[var(--rc-ink)]">{m.v}</p>
-              <p className="rc-mono text-[0.55rem] sm:text-[0.6rem] text-[var(--rc-ink-soft)] uppercase tracking-wider mt-0.5 leading-tight">{m.l}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="pt-3 border-t border-[var(--rc-wire)]">
-          <LeadForm heading="Get Similar Results" sub="" defaultService={`${caseStudy.industry} Case Study`} />
-        </div>
-      </motion.div>
-    </div>,
-    document.body
-  );
-}
-
-// ─── Testimonials Data ──────────────────────────────────────────────────────────
-
 
 const TECH = [
   { name: 'Next.js 15', tag: 'Framework', desc: 'Server-side rendering, static generation, ISR — all in one.' },
@@ -563,13 +496,6 @@ const GUARANTEES = [
   { icon: <RiShieldLine size={18} />, title: 'Transparent quoting — no surprises', desc: 'We offer accurate quotes based on clear project scopes. 50+ projects successfully delivered exactly as scoped.' },
   { icon: <RiTimeLine size={18} />, title: '30-day post-launch support', desc: '24-hour response time for bugs and questions. No support retainer required for the first 30 days.' },
 ];
-
-// NOTE: no `metadata` export here on purpose. This is a plain component
-// (imported into app/services/web-development/page.js), not a page.js —
-// Next.js App Router only reads `metadata`/`generateMetadata` from actual
-// page.js/layout.js files, so a metadata object here was dead code that
-// could never run. The real, correctly-fixed metadata for this route lives
-// in app/services/web-development/page.js.
 
 export default function WebDevelopmentPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
