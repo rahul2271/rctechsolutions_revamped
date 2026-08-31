@@ -23,6 +23,25 @@ import {
   RiStarFill, RiFireLine, RiExternalLinkLine, RiGoogleFill
 } from 'react-icons/ri';
 
+// ─── Utility for Google Ads Tracking ──────────────────────────────────────────
+const trackConversion = (type) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    if (type === 'whatsapp') {
+      window.gtag('event', 'conversion', { 
+        'send_to': 'AW-18337263682/HQA4COGJnOscEMLg8adE',
+        'value': 1.0,
+        'currency': 'INR'
+      });
+    } else if (type === 'call') {
+      window.gtag('event', 'conversion', { 
+        'send_to': 'AW-18337263682/AQA-CI3jmescEMLg8adE',
+        'value': 1.0,
+        'currency': 'INR'
+      });
+    }
+  }
+};
+
 // ─── React Portal Wrapper for Modals ─────────────────────────────────────────
 function ModalPortal({ children }) {
   const [mounted, setMounted] = useState(false);
@@ -157,6 +176,7 @@ function LeadForm({ heading, sub, defaultService = 'Web Development' }) {
         <div className="pt-2 sm:pt-3 border-t border-[var(--rc-wire)] grid grid-cols-2 gap-2">
           <a
             href="tel:+917009646377"
+            onClick={() => trackConversion('call')}
             className="rc-mono text-[0.7rem] sm:text-xs font-semibold py-2.5 px-2 border border-[var(--rc-wire)] bg-white text-[var(--rc-ink)] hover:border-[var(--rc-circuit)] hover:bg-[var(--rc-paper)] transition-all flex items-center justify-center gap-1 shadow-sm rounded-md"
           >
             <RiPhoneLine size={14} className="text-[var(--rc-trace)]" />
@@ -164,6 +184,7 @@ function LeadForm({ heading, sub, defaultService = 'Web Development' }) {
           </a>
           <a
             href={getWhatsAppUrl()}
+            onClick={() => trackConversion('whatsapp')}
             target="_blank"
             rel="noopener noreferrer"
             className="rc-mono text-[0.7rem] sm:text-xs font-semibold py-2.5 px-2 border border-[#25D366]/30 bg-[#25D366]/10 text-[#128C7E] hover:bg-[#25D366]/20 transition-all flex items-center justify-center gap-1 shadow-sm rounded-md"
@@ -543,6 +564,7 @@ export default function WebDevelopmentPage() {
                 </a>
                 <a
                   href="tel:+917009646377"
+                  onClick={() => trackConversion('call')}
                   className="rc-mono text-xs font-bold uppercase tracking-wider px-8 py-4 text-[var(--rc-ink)] bg-white border-2 border-[var(--rc-circuit)] rounded-lg hover:bg-[var(--rc-paper)] transition-all transform hover:-translate-y-1 shadow-md flex items-center gap-2"
                 >
                   <RiPhoneLine size={16} className="text-[var(--rc-trace)]" />
@@ -863,6 +885,7 @@ export default function WebDevelopmentPage() {
                       </a>
                       <a 
                         href="tel:+917009646377" 
+                        onClick={() => trackConversion('call')}
                         className="inline-flex items-center gap-1.5 rc-mono text-xs font-bold text-[var(--rc-ink)] hover:text-[var(--rc-circuit)] transition-colors"
                       >
                         <RiPhoneLine size={16} className="text-[var(--rc-trace)]" />
@@ -982,6 +1005,7 @@ export default function WebDevelopmentPage() {
             </div>
             <a 
               href="https://wa.me/917009646377?text=Hello%20RC%20Tech%20Solutions" 
+              onClick={() => trackConversion('whatsapp')}
               target="_blank" 
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rc-mono text-xs uppercase tracking-wider font-bold px-5 py-3 bg-[#25D366] text-white rounded-lg shadow hover:bg-[#128C7E] transition-all flex-shrink-0"
@@ -1092,11 +1116,11 @@ export default function WebDevelopmentPage() {
               <div className="p-6 bg-white rounded-2xl border-2 border-[var(--rc-trace)] shadow-lg space-y-4">
                 <p className="rc-mono text-xs uppercase tracking-wider font-bold text-[var(--rc-trace)]">Direct Expert Line (Mohali)</p>
                 <div className="flex flex-col gap-2">
-                  <a href="tel:+917009646377" className="rc-display text-2xl font-bold text-[var(--rc-ink)] hover:text-[var(--rc-circuit)] transition-colors flex items-center gap-2">
+                  <a href="tel:+917009646377" onClick={() => trackConversion('call')} className="rc-display text-2xl font-bold text-[var(--rc-ink)] hover:text-[var(--rc-circuit)] transition-colors flex items-center gap-2">
                     <RiPhoneLine size={20} className="text-[var(--rc-trace)]" />
                     <span>+91 70096-46377</span>
                   </a>
-                  <a href={generalWhatsAppUrl} target="_blank" rel="noopener noreferrer"
+                  <a href={generalWhatsAppUrl} onClick={() => trackConversion('whatsapp')} target="_blank" rel="noopener noreferrer"
                     className="rc-mono text-xs font-bold uppercase tracking-wider px-4 py-3 bg-[#25D366] text-white rounded-xl text-center hover:bg-[#128C7E] transition-all flex items-center justify-center gap-2 shadow">
                     <RiWhatsappLine size={18} />
                     <span>Chat Instantly on WhatsApp →</span>
@@ -1138,12 +1162,14 @@ export default function WebDevelopmentPage() {
       <div className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-[var(--rc-wire)] p-3 z-50 flex items-center gap-3 shadow-[0_-4px_15px_rgba(0,0,0,0.05)]">
         <a 
           href="tel:+917009646377" 
+          onClick={() => trackConversion('call')}
           className="flex-1 bg-white border border-[var(--rc-trace)] text-[var(--rc-ink)] font-extrabold uppercase tracking-wider text-xs py-3.5 rounded-lg flex items-center justify-center gap-1.5 shadow-sm"
         >
           <RiPhoneLine size={16} className="text-[var(--rc-trace)]" /> Call Now
         </a>
         <a 
           href={generalWhatsAppUrl} 
+          onClick={() => trackConversion('whatsapp')}
           target="_blank" 
           rel="noopener noreferrer" 
           className="flex-1 bg-[#25D366] text-white font-extrabold uppercase tracking-wider text-xs py-3.5 rounded-lg flex items-center justify-center gap-1.5 shadow-sm"
