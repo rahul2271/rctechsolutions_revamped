@@ -12,11 +12,15 @@ import { createPortal } from 'react-dom';
 const trackConversion = (type) => {
   if (typeof window !== 'undefined' && window.gtag) {
     if (type === 'whatsapp') {
-      // Replace with your actual Google Ads WhatsApp conversion ID and label
+      // Keep your WhatsApp label here once you generate it
       window.gtag('event', 'conversion', { 'send_to': 'AW-18337263682/whatsapp_label' });
     } else if (type === 'call') {
-      // Replace with your actual Google Ads Phone Call conversion ID and label
-      window.gtag('event', 'conversion', { 'send_to': 'AW-18337263682/call_label' });
+      // Your new Click-to-Call conversion code
+      window.gtag('event', 'conversion', { 
+        'send_to': 'AW-18337263682/AQA-CI3jmescEMLg8adE',
+        'value': 1.0,
+        'currency': 'INR'
+      });
     }
   }
 };
@@ -250,13 +254,13 @@ export default function AdvancedHeader() {
             <Link href="/" className="flex items-center gap-2 flex-shrink-0" aria-label="RC Tech Solutions home">
               <Image src="/rclogo.png" alt="RC Tech Solutions" width={30} height={30}
                 className="w-7 h-7 sm:w-8 sm:h-8 object-contain" priority />
-              <span className="rc-display text-sm sm:text-base font-semibold text-[var(--rc-ink)] tracking-tight">
+              <span className="rc-display text-sm sm:text-base font-semibold text-[var(--rc-ink)] king-tight">
                 RC Tech Solutions<span style={{ color: 'var(--rc-circuit)' }}>.</span>
               </span>
             </Link>
 
             {/* Desktop nav */}
-            <nav className="hidden lg:flex items-center gap-6 rc-mono text-[0.7rem] uppercase tracking-wider text-[var(--rc-ink-soft)]">
+            <nav className="hidden lg:flex items-center gap-6 rc-mono text-[0.7rem] uppercase king-wider text-[var(--rc-ink-soft)]">
               {TOP_NAV.map((link) => (
                 <Link key={link.href} href={link.href}
                   className="relative group py-1 hover:text-[var(--rc-circuit)] transition-colors">
@@ -325,7 +329,7 @@ export default function AdvancedHeader() {
 
             {/* Desktop CTA */}
             <Link href="/contact"
-              className="hidden lg:inline-flex items-center gap-1.5 rc-mono text-[0.7rem] uppercase tracking-wider px-4 py-2 border border-[var(--rc-ink)] text-[var(--rc-ink)] hover:bg-[var(--rc-ink)] hover:text-[var(--rc-paper)] transition-colors">
+              className="hidden lg:inline-flex items-center gap-1.5 rc-mono text-[0.7rem] uppercase king-wider px-4 py-2 border border-[var(--rc-ink)] text-[var(--rc-ink)] hover:bg-[var(--rc-ink)] hover:text-[var(--rc-paper)] transition-colors">
               <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--rc-circuit)', animation: 'rc-pulse 2.4s ease-in-out infinite' }} />
               Start a project
             </Link>
