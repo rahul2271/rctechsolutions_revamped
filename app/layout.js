@@ -413,16 +413,14 @@ export const metadata = {
   verification: process.env.NEXT_PUBLIC_GSC_VERIFICATION
     ? { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION }
     : undefined,
-  other: { "google-adsense-account": "ca-pub-4074858392407979" },
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en-IN">
       <head>
-        {/* Manually adding the AdSense meta tag */}
         <meta name="google-adsense-account" content="ca-pub-4074858392407979" />
-      <head/>
+      </head>
       <body
         suppressHydrationWarning
         className={`${poppins.variable} ${fraunces.variable} ${plexSans.variable} ${plexMono.variable} antialiased`}
