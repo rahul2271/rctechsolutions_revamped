@@ -419,7 +419,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en-IN">
-      <head />
+      <head>
+        {/* Manually adding the AdSense meta tag */}
+        <meta name="google-adsense-account" content="ca-pub-4074858392407979" />
+      <head/>
       <body
         suppressHydrationWarning
         className={`${poppins.variable} ${fraunces.variable} ${plexSans.variable} ${plexMono.variable} antialiased`}
